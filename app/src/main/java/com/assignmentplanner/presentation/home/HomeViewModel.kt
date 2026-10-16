@@ -1,11 +1,11 @@
-package com.assignmentplanner.ui.home
+package com.assignmentplanner.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.assignmentplanner.data.Assignment
-import com.assignmentplanner.data.InMemoryPlannerRepository
-import com.assignmentplanner.data.PlannerRepository
-import com.assignmentplanner.data.Status
+import com.assignmentplanner.data.local.entity.Assignment
+import com.assignmentplanner.data.local.entity.Course
+import com.assignmentplanner.data.repository.InMemoryPlannerRepository
+import com.assignmentplanner.data.repository.PlannerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +19,16 @@ enum class SortOption(val label: String) {
     PRIORITY("Priority")
 }
 
+data class AssignmentItem(
+    val assignment: Assignment,
+    val courseName: String
+)
+
 data class HomeUiState(
-    val assignments: List<Assignment> = emptyList(),
-    val availableCourses: List<String> = emptyList(),
+    val items: List<AssignmentItem> = emptyList(),
+    val availableCourses: List<Course> = emptyList(),
     val statusFilter: StatusFilter = StatusFilter.ALL,
-    val courseFilter: String? = null,
+    val courseFilter: Course? = null,
     val sortOption: SortOption = SortOption.DEADLINE,
     val hasAnyAssignments: Boolean = false,
     val isLoading: Boolean = true
@@ -36,24 +41,26 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val statusFilter = MutableStateFlow(StatusFilter.ALL)
-    private val courseFilter = MutableStateFlow<String?>(null)
+    private val courseFilterId = MutableStateFlow<Long?>(null)
     private val sortOption = MutableStateFlow(SortOption.DEADLINE)
 
     val uiState: StateFlow<HomeUiState> = combine(
         repository.getAssignments(),
+        repository.getCourses(),
         statusFilter,
-        courseFilter,
+        courseFilterId,
         sortOption
-    ) { all, status, course, sort ->
-        val courses = all.map { it.courseName }.distinct().sorted()
-        val activeCourse = course?.takeIf { it in courses }
+    ) { all, courses, status, courseId, sort ->
+        val courseNames = courses.associate { it.id to it.name }
+        val activeCourse = courses.find { it.id == courseId }
 
         HomeUiState(
-            assignments = all
+            items = all
                 .filter { it.matches(status) }
-                .filter { activeCourse == null || it.courseName == activeCourse }
-                .sortedWith(sort.comparator()),
-            availableCourses = courses,
+                .filter { activeCourse == null || it.courseId == activeCourse.id }
+                .sortedWith(sort.comparator())
+                .map { AssignmentItem(it, courseNames[it.courseId].orEmpty()) },
+            availableCourses = courses.sortedBy { it.name },
             statusFilter = status,
             courseFilter = activeCourse,
             sortOption = sort,
@@ -70,8 +77,8 @@ class HomeViewModel(
         statusFilter.value = filter
     }
 
-    fun setCourseFilter(course: String?) {
-        courseFilter.value = course
+    fun setCourseFilter(courseId: Long?) {
+        courseFilterId.value = courseId
     }
 
     fun setSortOption(option: SortOption) {
@@ -80,13 +87,13 @@ class HomeViewModel(
 
     fun clearFilters() {
         statusFilter.value = StatusFilter.ALL
-        courseFilter.value = null
+        courseFilterId.value = null
     }
 
     private fun Assignment.matches(filter: StatusFilter): Boolean = when (filter) {
         StatusFilter.ALL -> true
-        StatusFilter.PENDING -> status == Status.PENDING
-        StatusFilter.COMPLETED -> status == Status.COMPLETED
+        StatusFilter.PENDING -> !isCompleted
+        StatusFilter.COMPLETED -> isCompleted
     }
 
     private fun SortOption.comparator(): Comparator<Assignment> = when (this) {

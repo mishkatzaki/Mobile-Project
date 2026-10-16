@@ -1,4 +1,4 @@
-package com.assignmentplanner.ui.home
+package com.assignmentplanner.presentation.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,15 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.assignmentplanner.data.Assignment
-import com.assignmentplanner.data.Priority
-import com.assignmentplanner.data.Status
+import com.assignmentplanner.data.local.entity.Assignment
+import com.assignmentplanner.data.local.entity.Priority
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun AssignmentCard(
     assignment: Assignment,
+    courseName: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -26,7 +26,7 @@ fun AssignmentCard(
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (assignment.status == Status.COMPLETED) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+            containerColor = if (assignment.isCompleted) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -41,7 +41,7 @@ fun AssignmentCard(
                         .padding(end = 8.dp),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (assignment.status == Status.COMPLETED) Color.Gray else MaterialTheme.colorScheme.onSurface
+                    color = if (assignment.isCompleted) Color.Gray else MaterialTheme.colorScheme.onSurface
                 )
 
                 val priorityColor = when (assignment.priority) {
@@ -59,7 +59,7 @@ fun AssignmentCard(
             
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = assignment.courseName,
+                text = courseName,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -92,9 +92,9 @@ fun AssignmentCard(
                 }
 
                 Text(
-                    text = if (assignment.status == Status.COMPLETED) "Completed" else "Pending",
+                    text = if (assignment.isCompleted) "Completed" else "Pending",
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (assignment.status == Status.COMPLETED) Color.Gray else MaterialTheme.colorScheme.primary,
+                    color = if (assignment.isCompleted) Color.Gray else MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -103,7 +103,7 @@ fun AssignmentCard(
 }
 
 private fun getDeadlineText(assignment: Assignment): String {
-    if (assignment.status == Status.COMPLETED) return ""
+    if (assignment.isCompleted) return ""
     
     val today = LocalDate.now()
     return when {
@@ -114,7 +114,7 @@ private fun getDeadlineText(assignment: Assignment): String {
 }
 
 private fun getDeadlineColor(assignment: Assignment): Color {
-    if (assignment.status == Status.COMPLETED) return Color.Gray
+    if (assignment.isCompleted) return Color.Gray
     
     val today = LocalDate.now()
     return when {
