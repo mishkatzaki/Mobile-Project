@@ -5,18 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
-/**
- * Data API the screens depend on. Person 5 provides the Room-backed implementation
- * (CourseDao + AssignmentDao); screens only ever talk to this interface.
- */
 interface PlannerRepository {
     fun getAssignments(): Flow<List<Assignment>>
 }
 
-/**
- * Temporary in-memory implementation so the Home screen runs before Room is wired in.
- * Replace with the Room-backed repository once Person 5's DAOs are available.
- */
 object InMemoryPlannerRepository : PlannerRepository {
 
     private val assignments = MutableStateFlow(

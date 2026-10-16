@@ -54,9 +54,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Filters and Sort Section
             Column(modifier = Modifier.padding(16.dp)) {
-                // Status Filter Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -80,12 +78,10 @@ fun HomeScreen(
                 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Course and Sort Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Course Filter Dropdown
                     Box {
                         TextButton(onClick = { showCourseMenu = true }) {
                             Text(courseFilter ?: "All Courses")
@@ -113,7 +109,6 @@ fun HomeScreen(
                         }
                     }
 
-                    // Sort Dropdown
                     Box {
                         TextButton(onClick = { showSortMenu = true }) {
                             Text("Sort: ${sortOption.label}")
@@ -136,7 +131,6 @@ fun HomeScreen(
                 }
             }
 
-            // Assignments List
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -169,7 +163,6 @@ fun HomeScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    // Extra bottom padding keeps the last card clear of the FAB
                     contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 88.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {

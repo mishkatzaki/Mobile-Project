@@ -43,12 +43,11 @@ fun AssignmentCard(
                     fontWeight = FontWeight.Bold,
                     color = if (assignment.status == Status.COMPLETED) Color.Gray else MaterialTheme.colorScheme.onSurface
                 )
-                
-                // Priority Label
+
                 val priorityColor = when (assignment.priority) {
                     Priority.HIGH -> Color.Red
-                    Priority.MEDIUM -> Color(0xFFFFA500) // Orange
-                    Priority.LOW -> Color(0xFF4CAF50) // Green
+                    Priority.MEDIUM -> Color(0xFFFFA500)
+                    Priority.LOW -> Color(0xFF4CAF50)
                 }
                 Text(
                     text = assignment.priority.name,
@@ -70,7 +69,6 @@ fun AssignmentCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Due Date & Deadline Label
                 val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
                 val formattedDate = assignment.dueDate.format(dateFormatter)
                 
@@ -93,7 +91,6 @@ fun AssignmentCard(
                     }
                 }
 
-                // Status
                 Text(
                     text = if (assignment.status == Status.COMPLETED) "Completed" else "Pending",
                     style = MaterialTheme.typography.labelMedium,
@@ -122,7 +119,7 @@ private fun getDeadlineColor(assignment: Assignment): Color {
     val today = LocalDate.now()
     return when {
         assignment.dueDate.isBefore(today) -> Color.Red
-        assignment.dueDate.isEqual(today) -> Color(0xFFFFA500) // Orange
+        assignment.dueDate.isEqual(today) -> Color(0xFFFFA500)
         else -> Color.Gray
     }
 }

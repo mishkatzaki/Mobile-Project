@@ -31,7 +31,6 @@ data class HomeUiState(
     val isFiltered: Boolean get() = statusFilter != StatusFilter.ALL || courseFilter != null
 }
 
-// Repository defaults to the in-memory placeholder until Person 5's Room repository is ready.
 class HomeViewModel(
     repository: PlannerRepository = InMemoryPlannerRepository
 ) : ViewModel() {
@@ -47,7 +46,6 @@ class HomeViewModel(
         sortOption
     ) { all, status, course, sort ->
         val courses = all.map { it.courseName }.distinct().sorted()
-        // Drop a course filter whose course no longer has any assignments
         val activeCourse = course?.takeIf { it in courses }
 
         HomeUiState(
@@ -92,10 +90,8 @@ class HomeViewModel(
     }
 
     private fun SortOption.comparator(): Comparator<Assignment> = when (this) {
-        // Earliest deadline first; ties broken by higher priority
         SortOption.DEADLINE -> compareBy<Assignment> { it.dueDate }
             .thenByDescending { it.priority.ordinal }
-        // HIGH > MEDIUM > LOW; ties broken by earliest deadline
         SortOption.PRIORITY -> compareByDescending<Assignment> { it.priority.ordinal }
             .thenBy { it.dueDate }
     }

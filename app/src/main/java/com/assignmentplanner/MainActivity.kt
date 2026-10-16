@@ -19,12 +19,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Navigation Placeholder for Person 6
-                    // For now, directly showing HomeScreen as part of Person 1's testing
                     HomeScreen(
-                        onNavigateToAdd = { /* Navigate to Add Assignment (Person 2) */ },
-                        onNavigateToCourse = { /* Navigate to Courses (Person 4) */ },
-                        onNavigateToDetails = { _ -> /* Navigate to Details (Person 3) */ }
+                        onNavigateToAdd = { },
+                        onNavigateToCourse = { },
+                        onNavigateToDetails = { }
                     )
                 }
             }
