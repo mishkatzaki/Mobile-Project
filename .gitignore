@@ -1,0 +1,14 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/caches/
+/.idea/workspace.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/misc.xml
+.DS_Store
+build/
+/captures
+.externalNativeBuild
+.cxx
+hs_err_pid*.log
