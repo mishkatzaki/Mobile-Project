@@ -1,4 +1,4 @@
-package com.assignmentplanner.ui.home
+package com.assignmentplanner.presentation.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,14 +20,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToCourse: () -> Unit,
-    onNavigateToDetails: (Int) -> Unit,
+    onNavigateToDetails: (Long) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val statusFilter = uiState.statusFilter
     val courseFilter = uiState.courseFilter
     val sortOption = uiState.sortOption
-    val assignments = uiState.assignments
+    val assignmentItems = uiState.items
 
     var showCourseMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
@@ -84,7 +84,7 @@ fun HomeScreen(
                 ) {
                     Box {
                         TextButton(onClick = { showCourseMenu = true }) {
-                            Text(courseFilter ?: "All Courses")
+                            Text(courseFilter?.name ?: "All Courses")
                         }
                         DropdownMenu(
                             expanded = showCourseMenu,
@@ -99,9 +99,9 @@ fun HomeScreen(
                             )
                             uiState.availableCourses.forEach { course ->
                                 DropdownMenuItem(
-                                    text = { Text(course) },
+                                    text = { Text(course.name) },
                                     onClick = {
-                                        viewModel.setCourseFilter(course)
+                                        viewModel.setCourseFilter(course.id)
                                         showCourseMenu = false
                                     }
                                 )
@@ -138,7 +138,7 @@ fun HomeScreen(
                 ) {
                     CircularProgressIndicator()
                 }
-            } else if (assignments.isEmpty()) {
+            } else if (assignmentItems.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,10 +166,11 @@ fun HomeScreen(
                     contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 88.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(assignments, key = { it.id }) { assignment ->
+                    items(assignmentItems, key = { it.assignment.id }) { item ->
                         AssignmentCard(
-                            assignment = assignment,
-                            onClick = { onNavigateToDetails(assignment.id) }
+                            assignment = item.assignment,
+                            courseName = item.courseName,
+                            onClick = { onNavigateToDetails(item.assignment.id) }
                         )
                     }
                 }
