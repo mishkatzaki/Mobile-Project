@@ -1,6 +1,37 @@
 package com.assignmentplanner.data.local
 
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.assignmentplanner.data.local.dao.AssignmentDao
+import com.assignmentplanner.data.local.dao.CourseDao
+import com.assignmentplanner.data.local.entity.Assignment
+import com.assignmentplanner.data.local.entity.Course
 
-// TODO: Person 5 - add @Database(entities = [Course::class, Assignment::class], version = 1), courseDao()/assignmentDao(), type converters and a singleton builder
-abstract class AppDatabase : RoomDatabase()
+@Database(
+    entities = [Course::class, Assignment::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
+abstract class AppDatabase : RoomDatabase() {
+
+    abstract fun courseDao(): CourseDao
+    abstract fun assignmentDao(): AssignmentDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun get(context: Context): AppDatabase =
+            INSTANCE ?: synchronized(this) {
+                Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "planner.db"
+                ).build().also { INSTANCE = it }
+            }
+    }
+}

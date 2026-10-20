@@ -1,12 +1,25 @@
 package com.assignmentplanner.data.local.entity
 
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 enum class Priority { LOW, MEDIUM, HIGH }
 
-// TODO: Person 5 - add Room @Entity annotations, foreign key to Course, and a TypeConverter for LocalDate
+@Entity(
+    tableName = "assignments",
+    foreignKeys = [ForeignKey(
+        entity = Course::class,
+        parentColumns = ["id"],
+        childColumns = ["courseId"],
+        onDelete = ForeignKey.RESTRICT   // a course with assignments can't be deleted
+    )],
+    indices = [Index("courseId")]
+)
 data class Assignment(
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val courseId: Long,
     val title: String,
     val description: String = "",
