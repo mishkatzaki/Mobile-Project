@@ -13,3 +13,6 @@ build/
 .cxx
 hs_err_pid*.log
 /.idea/gradle.xml
+
+# Ignore nested repository copy
+/Mobile-Project/
