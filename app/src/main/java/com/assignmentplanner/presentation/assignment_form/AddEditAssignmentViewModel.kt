@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.assignmentplanner.data.local.entity.Assignment
 import com.assignmentplanner.data.local.entity.Course
 import com.assignmentplanner.data.local.entity.Priority
-import com.assignmentplanner.data.repository.InMemoryPlannerRepository
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.assignmentplanner.PlannerApplication
 import com.assignmentplanner.data.repository.PlannerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +36,7 @@ data class AddEditAssignmentUiState(
 }
 
 class AddEditAssignmentViewModel(
-    private val repository: PlannerRepository = InMemoryPlannerRepository
+    private val repository: PlannerRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditAssignmentUiState())
@@ -165,6 +168,19 @@ class AddEditAssignmentViewModel(
             }
 
             onSaved()
+        }
+    }
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                val application = this[
+                    ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+                ] as PlannerApplication
+
+                AddEditAssignmentViewModel(
+                    repository = application.repository
+                )
+            }
         }
     }
 }

@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignmentplanner.data.local.entity.Assignment
 import com.assignmentplanner.data.local.entity.Course
-import com.assignmentplanner.data.repository.InMemoryPlannerRepository
+import android.app.Application
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.assignmentplanner.PlannerApplication
 import com.assignmentplanner.data.repository.PlannerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,8 +41,8 @@ data class HomeUiState(
 }
 
 class HomeViewModel(
-    repository: PlannerRepository = InMemoryPlannerRepository
-) : ViewModel() {
+    private val repository: PlannerRepository
+) : ViewModel()  {
 
     private val statusFilter = MutableStateFlow(StatusFilter.ALL)
     private val courseFilterId = MutableStateFlow<Long?>(null)
@@ -101,5 +105,17 @@ class HomeViewModel(
             .thenByDescending { it.priority.ordinal }
         SortOption.PRIORITY -> compareByDescending<Assignment> { it.priority.ordinal }
             .thenBy { it.dueDate }
+    }
+
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                val application = this[
+                    ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+                ] as PlannerApplication
+
+                HomeViewModel(repository = application.repository)
+            }
+        }
     }
 }

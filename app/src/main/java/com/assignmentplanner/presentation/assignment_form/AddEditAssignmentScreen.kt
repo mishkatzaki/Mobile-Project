@@ -48,7 +48,7 @@ fun AddEditAssignmentScreen(
     assignmentId: Long?,
     onNavigateBack: () -> Unit,
     onNavigateToCourses: () -> Unit,
-    viewModel: AddEditAssignmentViewModel = viewModel()
+    viewModel: AddEditAssignmentViewModel = viewModel(factory = AddEditAssignmentViewModel.Factory)
 ) {
     LaunchedEffect(assignmentId) {
         viewModel.loadAssignment(assignmentId)

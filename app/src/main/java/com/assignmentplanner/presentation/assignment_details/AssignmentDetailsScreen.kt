@@ -50,7 +50,7 @@ fun AssignmentDetailsScreen(
     onNavigateBack: () -> Unit,
     onEdit: (Long) -> Unit,
     onDeleted: () -> Unit,
-    viewModel: AssignmentDetailsViewModel = viewModel()
+    viewModel: AssignmentDetailsViewModel = viewModel(factory = AssignmentDetailsViewModel.Factory)
 ) {
     LaunchedEffect(assignmentId) {
         viewModel.loadAssignment(assignmentId)
