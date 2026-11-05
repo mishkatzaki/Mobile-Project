@@ -1,3 +1,4 @@
+
 package com.assignmentplanner.presentation.home
 
 import androidx.lifecycle.ViewModel
@@ -36,11 +37,12 @@ data class HomeUiState(
     val hasAnyAssignments: Boolean = false,
     val isLoading: Boolean = true
 ) {
-    val isFiltered: Boolean get() = statusFilter != StatusFilter.ALL || courseFilter != null
+    val isFiltered: Boolean
+        get() = statusFilter != StatusFilter.ALL || courseFilter != null
 }
 
 class HomeViewModel(
-    repository: PlannerRepository
+    private val repository: PlannerRepository
 ) : ViewModel() {
 
     private val statusFilter = MutableStateFlow(StatusFilter.ALL)
@@ -109,8 +111,13 @@ class HomeViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as PlannerApplication
-                HomeViewModel(application.repository)
+                val application = this[
+                    ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+                ] as PlannerApplication
+
+                HomeViewModel(
+                    repository = application.repository
+                )
             }
         }
     }

@@ -4,7 +4,10 @@ package com.assignmentplanner.presentation.assignment_details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignmentplanner.data.local.entity.Assignment
-import com.assignmentplanner.data.repository.InMemoryPlannerRepository
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.assignmentplanner.PlannerApplication
 import com.assignmentplanner.data.repository.PlannerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +22,7 @@ data class AssignmentDetailsUiState(
 )
 
 class AssignmentDetailsViewModel(
-    private val repository: PlannerRepository = InMemoryPlannerRepository
+    private val repository: PlannerRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssignmentDetailsUiState())
@@ -80,6 +83,19 @@ class AssignmentDetailsViewModel(
             append("Status: ${
                 if (assignment.isCompleted) "Completed" else "Pending"
             }")
+        }
+    }
+    companion object {
+        val Factory = viewModelFactory {
+            initializer {
+                val application = this[
+                    ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
+                ] as PlannerApplication
+
+                AssignmentDetailsViewModel(
+                    repository = application.repository
+                )
+            }
         }
     }
 }
