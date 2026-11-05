@@ -21,7 +21,7 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToCourse: () -> Unit,
     onNavigateToDetails: (Long) -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val statusFilter = uiState.statusFilter
