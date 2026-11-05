@@ -1,14 +1,14 @@
+
 package com.assignmentplanner.presentation.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.assignmentplanner.data.local.entity.Assignment
-import com.assignmentplanner.data.local.entity.Course
-import android.app.Application
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.assignmentplanner.PlannerApplication
+import com.assignmentplanner.data.local.entity.Assignment
+import com.assignmentplanner.data.local.entity.Course
 import com.assignmentplanner.data.repository.PlannerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,12 +37,13 @@ data class HomeUiState(
     val hasAnyAssignments: Boolean = false,
     val isLoading: Boolean = true
 ) {
-    val isFiltered: Boolean get() = statusFilter != StatusFilter.ALL || courseFilter != null
+    val isFiltered: Boolean
+        get() = statusFilter != StatusFilter.ALL || courseFilter != null
 }
 
 class HomeViewModel(
     private val repository: PlannerRepository
-) : ViewModel()  {
+) : ViewModel() {
 
     private val statusFilter = MutableStateFlow(StatusFilter.ALL)
     private val courseFilterId = MutableStateFlow<Long?>(null)
@@ -114,7 +115,9 @@ class HomeViewModel(
                     ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY
                 ] as PlannerApplication
 
-                HomeViewModel(repository = application.repository)
+                HomeViewModel(
+                    repository = application.repository
+                )
             }
         }
     }
