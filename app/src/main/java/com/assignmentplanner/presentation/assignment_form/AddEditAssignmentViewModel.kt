@@ -43,16 +43,22 @@ class AddEditAssignmentViewModel(
     val uiState: StateFlow<AddEditAssignmentUiState> = _uiState.asStateFlow()
 
 
+    private var isInitialized = false
+
     fun loadAssignment(assignmentId: Long?) {
+        // Returning from Courses can re-enter composition with the same draft.
+        if (isInitialized) return
+        isInitialized = true
+        _uiState.value = _uiState.value.copy(assignmentId = assignmentId)
+
         viewModelScope.launch {
-            val courses = repository.getCourses().first()
+            repository.getCourses().collect { courses ->
+                _uiState.value = _uiState.value.copy(courses = courses)
+            }
+        }
 
-            _uiState.value = AddEditAssignmentUiState(
-                assignmentId = assignmentId,
-                courses = courses
-            )
-
-            if (assignmentId != null) {
+        if (assignmentId != null) {
+            viewModelScope.launch {
                 val assignment = repository.getAssignment(assignmentId).first()
 
                 if (assignment != null) {
