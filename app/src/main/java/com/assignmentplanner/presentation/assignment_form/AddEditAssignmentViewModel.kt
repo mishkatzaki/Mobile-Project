@@ -150,10 +150,11 @@ class AddEditAssignmentViewModel(
             "Due date is required"
         } else if (parsedDate == null) {
             "Use the format YYYY-MM-DD, with - between year, month and day (e.g. 2026-12-31)"
+        } else if (parsedDate.isBefore(LocalDate.now()) && !state.isEditing) {
+            "Due date cannot be in the past"
         } else {
             null
         }
-
         _uiState.value = state.copy(
             titleError = titleError,
             courseError = courseError,
