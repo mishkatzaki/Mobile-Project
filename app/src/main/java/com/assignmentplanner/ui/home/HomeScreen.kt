@@ -14,10 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import android.view.LayoutInflater
-import android.widget.TextView
-import androidx.compose.ui.viewinterop.AndroidView
-import com.assignmentplanner.R
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -147,18 +144,15 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    AndroidView(
-                        factory = { ctx ->
-                            LayoutInflater.from(ctx).inflate(R.layout.view_empty_state, null)
+                    Text(
+                        text = if (uiState.hasAnyAssignments) {
+                            "No assignments match these filters."
+                        } else {
+                            "No assignments yet.\nTap + to add a new one."
                         },
-                        update = { view ->
-                            view.findViewById<TextView>(R.id.emptyMessage).text =
-                                if (uiState.hasAnyAssignments) {
-                                    "No assignments match these filters."
-                                } else {
-                                    "No assignments yet.\nTap + to add a new one."
-                                }
-                        }
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                     if (uiState.hasAnyAssignments && uiState.isFiltered) {
                         TextButton(onClick = viewModel::clearFilters) {
