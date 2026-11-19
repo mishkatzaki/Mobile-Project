@@ -23,6 +23,7 @@ data class AddEditAssignmentUiState(
     val title: String = "",
     val courseId: Long? = null,
     val dueDate: LocalDate? = null,
+    val dueDateText: String = "",
     val description: String = "",
     val priority: Priority = Priority.MEDIUM,
     val isCompleted: Boolean = false,
@@ -38,6 +39,14 @@ data class AddEditAssignmentUiState(
 class AddEditAssignmentViewModel(
     private val repository: PlannerRepository
 ) : ViewModel() {
+
+    private fun parseDate(text: String): LocalDate? {
+        return try {
+            LocalDate.parse(text.trim())
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     private val _uiState = MutableStateFlow(AddEditAssignmentUiState())
     val uiState: StateFlow<AddEditAssignmentUiState> = _uiState.asStateFlow()
@@ -67,6 +76,7 @@ class AddEditAssignmentViewModel(
                         title = assignment.title,
                         courseId = assignment.courseId,
                         dueDate = assignment.dueDate,
+                        dueDateText = assignment.dueDate.toString(),
                         description = assignment.description,
                         priority = assignment.priority,
                         isCompleted = assignment.isCompleted
@@ -93,9 +103,10 @@ class AddEditAssignmentViewModel(
     }
 
 
-    fun onDueDateChange(date: LocalDate) {
+    fun onDueDateTextChange(text: String) {
         _uiState.value = _uiState.value.copy(
-            dueDate = date,
+            dueDateText = text,
+            dueDate = parseDate(text),
             dueDateError = null
         )
     }
@@ -138,9 +149,17 @@ class AddEditAssignmentViewModel(
                 null
             }
 
-        val dueDateError =
-            if (state.dueDate == null) "Due date is required" else null
+        val parsedDate = parseDate(state.dueDateText)
 
+        val dueDateError = if (state.dueDateText.isBlank()) {
+            "Due date is required"
+        } else if (parsedDate == null) {
+            "Use the format YYYY-MM-DD, with - between year, month and day (e.g. 2026-12-31)"
+        } else if (parsedDate.isBefore(LocalDate.now()) && !state.isEditing) {
+            "Due date cannot be in the past"
+        } else {
+            null
+        }
         _uiState.value = state.copy(
             titleError = titleError,
             courseError = courseError,
@@ -162,7 +181,7 @@ class AddEditAssignmentViewModel(
                 courseId = state.courseId!!,
                 title = state.title.trim(),
                 description = state.description.trim(),
-                dueDate = state.dueDate!!,
+                dueDate = parsedDate!!,
                 priority = state.priority,
                 isCompleted = state.isCompleted
             )

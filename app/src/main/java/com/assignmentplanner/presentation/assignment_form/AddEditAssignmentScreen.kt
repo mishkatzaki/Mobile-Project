@@ -57,11 +57,6 @@ fun AddEditAssignmentScreen(
     val state by viewModel.uiState.collectAsState()
 
     var courseMenuExpanded by remember { mutableStateOf(false) }
-    var dueDateText by remember { mutableStateOf("") }
-
-    LaunchedEffect(state.dueDate) {
-        dueDateText = state.dueDate?.toString() ?: ""
-    }
 
     Scaffold(
         topBar = {
@@ -173,17 +168,8 @@ fun AddEditAssignmentScreen(
 
 
             OutlinedTextField(
-                value = dueDateText,
-                onValueChange = { input ->
-                    dueDateText = input
-                    val parsedDate = runCatching {
-                        LocalDate.parse(input)
-                    }.getOrNull()
-
-                    if (parsedDate != null) {
-                        viewModel.onDueDateChange(parsedDate)
-                    }
-                },
+                value = state.dueDateText,
+                onValueChange = viewModel::onDueDateTextChange,
                 label = { Text("Due Date (YYYY-MM-DD)") },
                 placeholder = { Text("2026-12-31") },
                 modifier = Modifier.fillMaxWidth(),
